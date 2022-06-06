@@ -1,4 +1,4 @@
-const { POSTGRES_URI, PORT } = require('./utils/config')
+const { POSTGRES_URI } = require('./utils/config')
 const { Sequelize, QueryTypes } = require('sequelize')
 
 const sequelize = new Sequelize(POSTGRES_URI, {

@@ -15,26 +15,17 @@ morgan.token('blog', (req) => JSON.stringify(req.body))
 
 logger.info('connecting to postgres')
 
-const sequelize = new Sequelize(POSTGRES_URI, {
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
-})
+// const main = async () => {
+//   try {
+//     await sequelize.authenticate()
+//     console.log('Connection has been established successfully')
+//     sequelize.close()
+//   } catch (error) {
+//     console.error('Unable to connect to the database:', error)
+//   }
+// }
 
-const main = async () => {
-  try {
-    await sequelize.authenticate()
-    console.log('Connection has been established successfully')
-    sequelize.close()
-  } catch (error) {
-    console.error('Unable to connect to the database:', error)
-  }
-}
-
-main()
+// main()
 
 app.use(cors())
 app.use(express.json())
