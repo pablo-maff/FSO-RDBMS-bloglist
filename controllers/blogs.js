@@ -1,16 +1,18 @@
 const blogsRouter = require('express').Router()
-const Blog = require('../models/blog')
-const { userExtractor, blogExtractor } = require('../utils/middleware')
+const { Blog } = require('../models')
+const {
+  userExtractor,
+  blogExtractor,
+  blogFinder,
+} = require('../utils/middleware')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
   blogs ? res.json(blogs) : res.status(404).end()
 })
 
-blogsRouter.get('/:id', async (req, res) => {
-  const blog = await Blog.findById(req.params.id)
-
-  blog ? res.status(200).json(blog.toJSON()) : res.status(404).end()
+blogsRouter.get('/:id', blogFinder, async (req, res) => {
+  req.blog ? res.json(req.blog) : res.status(404).end()
 })
 
 blogsRouter.post('/', async (req, res) => {
@@ -37,12 +39,14 @@ blogsRouter.post('/', async (req, res) => {
   res.status(201).json(blog)
 })
 
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id', blogFinder, async (req, res) => {
   // const authorId = req.blog.user.toString()
   // const userId = req.token.id
 
   // if (authorId === userId) {
-  await Blog.destroy({ where: { id: req.params.id } })
+  if (req.blog) {
+    await req.blog.destroy()
+  }
   res.status(204).end()
   // } else
   //   res
@@ -50,22 +54,15 @@ blogsRouter.delete('/:id', async (req, res) => {
   //     .send({ error: "You are not allowed to delete someone else's blogs" })
 })
 
-blogsRouter.put('/:id', async (req, res) => {
-  const body = req.body
-
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
+blogsRouter.put('/:id', blogFinder, async (req, res) => {
+  if (!req.body.likes) {
+    return res.status(400).end()
   }
 
-  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
-    new: true,
-  })
-  updatedBlog
-    ? res.status(200).json(updatedBlog.toJSON())
-    : res.status(404).end()
+  req.blog.likes = req.body.likes
+
+  const updatedBlog = await req.blog.save()
+  updatedBlog ? res.json(updatedBlog) : res.status(404).end()
 })
 
 module.exports = blogsRouter

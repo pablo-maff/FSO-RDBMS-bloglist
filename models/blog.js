@@ -1,7 +1,8 @@
 const { Model, DataTypes } = require('sequelize')
-const { sequelize } = require('../utils/config')
+const { sequelize } = require('../utils/db')
 
 class Blog extends Model {}
+
 Blog.init(
   {
     id: {
@@ -22,7 +23,7 @@ Blog.init(
     },
     likes: {
       type: DataTypes.INTEGER,
-      default: 0,
+      defaultValue: 0,
     },
   },
   {
@@ -32,7 +33,5 @@ Blog.init(
     modelName: 'note',
   }
 )
-
-Blog.sync()
 
 module.exports = Blog

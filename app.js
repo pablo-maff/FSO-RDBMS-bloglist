@@ -1,4 +1,3 @@
-const { POSTGRES_URI } = require('./utils/config')
 const express = require('express')
 require('express-async-errors')
 const app = express()
@@ -9,23 +8,10 @@ const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const morgan = require('morgan')
-const { Sequelize } = require('sequelize')
 
 morgan.token('blog', (req) => JSON.stringify(req.body))
 
 logger.info('connecting to postgres')
-
-// const main = async () => {
-//   try {
-//     await sequelize.authenticate()
-//     console.log('Connection has been established successfully')
-//     sequelize.close()
-//   } catch (error) {
-//     console.error('Unable to connect to the database:', error)
-//   }
-// }
-
-// main()
 
 app.use(cors())
 app.use(express.json())
