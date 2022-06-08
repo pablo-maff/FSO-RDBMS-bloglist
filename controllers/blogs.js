@@ -1,5 +1,5 @@
 const blogsRouter = require('express').Router()
-const { Blog } = require('../models')
+const { Blog, User } = require('../models')
 const {
   userExtractor,
   blogFinder,
@@ -7,7 +7,13 @@ const {
 } = require('../utils/middleware')
 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.findAll()
+  const blogs = await Blog.findAll({
+    attributes: { exclude: ['userId'] },
+    include: {
+      model: User,
+      attributes: ['name'],
+    },
+  })
   blogs ? res.json(blogs) : res.status(404).end()
 })
 
@@ -36,8 +42,6 @@ blogsRouter.delete(
   async (req, res) => {
     const blogAuthorId = req.blog.userId
     const userId = req.user.id
-    console.log('blogAuthorId', blogAuthorId)
-    console.log('userId', userId)
 
     if (blogAuthorId === userId && req.blog) {
       await req.blog.destroy()
