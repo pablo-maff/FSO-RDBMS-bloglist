@@ -2,6 +2,7 @@ const logger = require('./logger')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Blog = require('../models/blog')
+const { SECRET } = require('./config')
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'Unknwonw endpoint' })
@@ -39,25 +40,16 @@ const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     const token = authorization.substring(7)
-
-    req.token = jwt.verify(token, process.env.SECRET) // Verify token validity and decode token (returns the Object which the token was based on)
-    if (!req.token.id) {
-      return res.status(401).json({ error: 'Token missing or invalid' })
-    }
+    req.token = jwt.verify(token, SECRET)
 
     next()
-  } else next()
+  } else {
+    res.status(401).json({ error: 'token missing' })
+  }
 }
 
 const userExtractor = async (req, res, next) => {
-  req.user = await User.findById(req.token.id)
-
-  next()
-}
-
-const blogExtractor = async (req, res, next) => {
-  req.blog = await Blog.findById(req.params.id)
-
+  req.user = await User.findByPk(req.token.id)
   next()
 }
 
@@ -71,6 +63,5 @@ module.exports = {
   errorHandler,
   tokenExtractor,
   userExtractor,
-  blogExtractor,
   blogFinder,
 }
