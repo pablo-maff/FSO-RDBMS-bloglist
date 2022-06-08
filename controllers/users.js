@@ -1,38 +1,50 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
-const User = require('../models/user')
+const { User } = require('../models')
 
 usersRouter.get('/', async (req, res) => {
-  const users = await User
-    .find({}).populate('blogs', { url: 1, title: 1, author: 1})
-
+  const users = await User.findAll()
   res.json(users)
 })
 
 usersRouter.post('/', async (req, res) => {
-  const { username, name, password } = req.body
-
-  if ((username && password) && (username.length >= 3 && password.length >= 3)) {
-    const existingUser = await User.findOne({ username })
-    if (existingUser) {
-      return res.status(400).json({ error: 'Username must be unique '})
-    } 
-  } else return res.status(400).json({
-    error: 'Username and Password must be provided and they must be at least 3 characters long'
-  })
+  const { password, ...userDetails } = req.body
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
-  const user = new User({
-    username,
-    name,
-    passwordHash
+  const newUser = {
+    ...userDetails,
+    passwordHash,
+  }
+
+  const user = await User.create(newUser)
+  res.status(201).json(user)
+})
+
+usersRouter.get('/:id', async (req, res) => {
+  const user = await User.findByPk(req.params.id)
+  if (user) {
+    res.json(user)
+  } else {
+    res.status(404).end()
+  }
+})
+
+usersRouter.put('/:username', async (req, res) => {
+  const { username } = req.body
+  const user = await User.findOne({
+    where: {
+      username: req.params.username,
+    },
   })
-
-  const savedUser = await user.save()
-
-  res.status(201).json(savedUser)
+  if (user) {
+    user.username = username
+    const updatedUser = await user.save()
+    res.json(updatedUser)
+  } else {
+    res.status(404).end()
+  }
 })
 
 module.exports = usersRouter
