@@ -1,6 +1,10 @@
 const blogsRouter = require('express').Router()
 const { Blog } = require('../models')
-const { userExtractor, blogFinder } = require('../utils/middleware')
+const {
+  userExtractor,
+  blogFinder,
+  tokenExtractor,
+} = require('../utils/middleware')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
@@ -11,35 +15,40 @@ blogsRouter.get('/:id', blogFinder, async (req, res) => {
   req.blog ? res.json(req.blog) : res.status(404).end()
 })
 
-blogsRouter.post('/', userExtractor, async (req, res) => {
+blogsRouter.post('/', [tokenExtractor, userExtractor], async (req, res) => {
   const { title, author, url, likes } = req.body
-  const user = req.user
+  const userId = req.user.id
 
   const blog = await Blog.create({
     title,
     author,
     url,
     likes,
-    userId: user.id,
+    userId,
   })
 
   res.status(201).json(blog)
 })
 
-blogsRouter.delete('/:id', blogFinder, async (req, res) => {
-  // const authorId = req.blog.user.toString()
-  // const userId = req.token.id
+blogsRouter.delete(
+  '/:id',
+  [blogFinder, tokenExtractor, userExtractor],
+  async (req, res) => {
+    const blogAuthorId = req.blog.userId
+    const userId = req.user.id
+    console.log('blogAuthorId', blogAuthorId)
+    console.log('userId', userId)
 
-  // if (authorId === userId) {
-  if (req.blog) {
-    await req.blog.destroy()
+    if (blogAuthorId === userId && req.blog) {
+      await req.blog.destroy()
+      res.status(204).end()
+    } else {
+      res
+        .status(401)
+        .send({ error: "You are not allowed to delete someone else's blogs" })
+    }
   }
-  res.status(204).end()
-  // } else
-  //   res
-  //     .status(401)
-  //     .send({ error: "You are not allowed to delete someone else's blogs" })
-})
+)
 
 blogsRouter.put('/:id', blogFinder, async (req, res) => {
   if (!req.body.likes) {

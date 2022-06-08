@@ -20,7 +20,7 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :blog')
 )
 
-app.use(middleware.tokenExtractor)
+// app.use(middleware.tokenExtractor)
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
