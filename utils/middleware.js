@@ -14,7 +14,11 @@ const errorHandler = (error, req, res, next) => {
     })
   } else if (error.name === 'SequelizeValidationError') {
     return res.status(400).json({
-      error: error.message,
+      error: 'Validation isEmail on username failed',
+    })
+  } else if (error.name === 'UsernameExists') {
+    return res.status(400).json({
+      error: 'Validation userExists on username failed',
     })
   } else if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({

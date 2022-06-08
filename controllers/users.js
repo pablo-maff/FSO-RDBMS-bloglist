@@ -10,6 +10,18 @@ usersRouter.get('/', async (req, res) => {
 usersRouter.post('/', async (req, res) => {
   const { password, ...userDetails } = req.body
 
+  const user = await User.findOne({
+    where: {
+      username: userDetails.username,
+    },
+  })
+
+  if (user) {
+    return res
+      .status(400)
+      .json({ error: 'This username already exists. Choose a different one' })
+  }
+
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
@@ -18,8 +30,8 @@ usersRouter.post('/', async (req, res) => {
     passwordHash,
   }
 
-  const user = await User.create(newUser)
-  res.status(201).json(user)
+  const createUser = await User.create(newUser)
+  res.status(201).json(createUser)
 })
 
 usersRouter.get('/:id', async (req, res) => {
