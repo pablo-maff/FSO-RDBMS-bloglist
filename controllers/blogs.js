@@ -5,6 +5,7 @@ const {
   blogFinder,
   tokenExtractor,
 } = require('../utils/middleware')
+const { Op } = require('sequelize')
 const { sequelize } = require('../utils/db')
 
 blogsRouter.get('/', async (req, res) => {
@@ -13,11 +14,16 @@ blogsRouter.get('/', async (req, res) => {
   if (req.query.search) {
     const lookupValue = req.query.search.toLowerCase()
     where = {
-      where: sequelize.where(
-        sequelize.fn('LOWER', sequelize.col('title')),
-        'LIKE',
-        '%' + lookupValue + '%'
-      ),
+      where: {
+        [Op.or]: [
+          sequelize.where(sequelize.fn('LOWER', sequelize.col('title')), {
+            [Op.substring]: lookupValue,
+          }),
+          sequelize.where(sequelize.fn('LOWER', sequelize.col('author')), {
+            [Op.substring]: lookupValue,
+          }),
+        ],
+      },
     }
   }
 
