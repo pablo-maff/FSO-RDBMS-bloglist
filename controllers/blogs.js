@@ -5,14 +5,29 @@ const {
   blogFinder,
   tokenExtractor,
 } = require('../utils/middleware')
+const { sequelize } = require('../utils/db')
 
 blogsRouter.get('/', async (req, res) => {
+  let where = {}
+
+  if (req.query.search) {
+    const lookupValue = req.query.search.toLowerCase()
+    where = {
+      where: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('title')),
+        'LIKE',
+        '%' + lookupValue + '%'
+      ),
+    }
+  }
+
   const blogs = await Blog.findAll({
     attributes: { exclude: ['userId'] },
     include: {
       model: User,
       attributes: ['name'],
     },
+    where,
   })
   blogs ? res.json(blogs) : res.status(404).end()
 })
