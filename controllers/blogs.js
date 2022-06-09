@@ -34,6 +34,7 @@ blogsRouter.get('/', async (req, res) => {
       attributes: ['name'],
     },
     where,
+    order: [['likes', 'DESC']],
   })
   blogs ? res.json(blogs) : res.status(404).end()
 })
