@@ -8,15 +8,20 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      content: {
+      author: {
+        type: DataTypes.TEXT,
+      },
+      url: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      important: {
-        type: DataTypes.BOOLEAN,
+      title: {
+        type: DataTypes.TEXT,
+        allowNull: false,
       },
-      date: {
-        type: DataTypes.DATE,
+      likes: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -37,6 +42,12 @@ module.exports = {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
+        validate: {
+          is: {
+            args: [/^\w*@\w*\.(\w{3}|\w{2}\.\w{2})$/],
+            msg: 'UsernameValidationError',
+          },
+        },
       },
       name: {
         type: DataTypes.STRING,

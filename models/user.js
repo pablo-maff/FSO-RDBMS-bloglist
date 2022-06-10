@@ -16,7 +16,10 @@ User.init(
       unique: true,
       allowNull: false,
       validate: {
-        is: /^\w*@\w*\.(\w{3}|\w{2}\.\w{2})$/,
+        is: {
+          args: [/^\w*@\w*\.(\w{3}|\w{2}\.\w{2})$/],
+          msg: 'UsernameValidationError',
+        },
       },
     },
     name: {

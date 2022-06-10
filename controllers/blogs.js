@@ -44,7 +44,7 @@ blogsRouter.get('/:id', blogFinder, async (req, res) => {
 })
 
 blogsRouter.post('/', [tokenExtractor, userExtractor], async (req, res) => {
-  const { title, author, url, likes } = req.body
+  const { title, author, url, likes, year } = req.body
   const userId = req.user.id
 
   const blog = await Blog.create({
@@ -52,6 +52,7 @@ blogsRouter.post('/', [tokenExtractor, userExtractor], async (req, res) => {
     author,
     url,
     likes,
+    year,
     userId,
   })
 

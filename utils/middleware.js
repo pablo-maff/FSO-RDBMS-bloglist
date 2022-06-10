@@ -13,9 +13,13 @@ const errorHandler = (error, req, res, next) => {
     return res.status(400).send({
       error: error.message,
     })
-  } else if (error.name === 'SequelizeValidationError') {
+  } else if (error.errors[0].message === 'UsernameValidationError') {
     return res.status(400).json({
       error: 'Validation isEmail on username failed',
+    })
+  } else if (error.errors[0].message === 'BlogYearValidationError') {
+    return res.status(400).json({
+      error: 'Year must be greater than 1991 and less than 2022',
     })
   } else if (error.name === 'UsernameExists') {
     return res.status(400).json({

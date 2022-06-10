@@ -3,6 +3,6 @@ Content-Type: application/json
 
 { 
   "username": "nonSensePoetry@email.co.uk",
-  "name": "email3",
+  "name": "Edward Lear",
   "password": "password"
 }

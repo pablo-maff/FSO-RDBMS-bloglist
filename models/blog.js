@@ -25,6 +25,20 @@ Blog.init(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    year: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: {
+          args: [1991],
+          msg: 'BlogYearValidationError',
+        },
+        max: {
+          args: [2022],
+          msg: 'BlogYearValidationError',
+        },
+      },
+    },
   },
   {
     sequelize,
