@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
-const { User, Blog } = require('../models')
+const { User, Blog, ReadingList } = require('../models')
 
 usersRouter.get('/', async (req, res) => {
   const users = await User.findAll({
+    attributes: { exclude: ['passwordHash'] },
     include: {
       model: Blog,
       attributes: { exclude: ['userId'] },
@@ -41,15 +42,22 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.get('/:id', async (req, res) => {
   const user = await User.findByPk(req.params.id, {
-    // attributes: { exclude: [''] },
+    attributes: { exclude: ['passwordHash', 'id'] },
     include: [
       {
         model: Blog,
         as: 'readings',
         attributes: { exclude: ['userId'] },
         through: {
-          attributes: [],
+          attributes: ['id', 'read'], // Example of when a BUG becomes a feature
         },
+        // include: {  // This was the feature on top of the BUG
+        //   model: ReadingList,
+        //   attributes: ['id', 'read'],
+        //   where: {
+        //     userId: req.params.id,
+        //   },
+        // },
       },
     ],
   })
