@@ -9,6 +9,7 @@ const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const morgan = require('morgan')
 const authorsRouter = require('./controllers/authors')
+const readingListsRouter = require('./controllers/readingLists')
 
 morgan.token('blog', (req) => JSON.stringify(req.body))
 
@@ -27,6 +28,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/authors', authorsRouter)
+app.use('/api/readinglists', readingListsRouter)
 
 if (process.env.NODE_ENV === 'test') {
   const testingRouter = require('./controllers/testing')
