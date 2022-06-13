@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const { User, Blog } = require('../models')
+const { Op } = require('sequelize')
 
 usersRouter.get('/', async (req, res) => {
   const users = await User.findAll({
@@ -41,6 +42,14 @@ usersRouter.post('/', async (req, res) => {
 })
 
 usersRouter.get('/:id', async (req, res) => {
+  let where = {}
+
+  if (req.query.read) {
+    where = {
+      '$readings.readingList.read$': req.query.read,
+    }
+  }
+
   const user = await User.findByPk(req.params.id, {
     attributes: { exclude: ['passwordHash', 'id'] },
     include: [
@@ -51,6 +60,7 @@ usersRouter.get('/:id', async (req, res) => {
         through: {
           attributes: ['id', 'read'], // Example of when a BUG becomes a feature
         },
+        where,
         // include: {  // This was the feature on top of the BUG
         //   model: ReadingList,
         //   attributes: ['id', 'read'],
