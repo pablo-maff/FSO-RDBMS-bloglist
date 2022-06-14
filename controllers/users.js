@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const { User, Blog } = require('../models')
-const { Op } = require('sequelize')
+const { tokenExtractor } = require('../utils/middleware')
 
 usersRouter.get('/', async (req, res) => {
   const users = await User.findAll({
@@ -18,6 +18,7 @@ usersRouter.post('/', async (req, res) => {
   const { password, ...userDetails } = req.body
 
   const user = await User.findOne({
+    attributes: { exclude: ['passwordHash'] },
     where: {
       username: userDetails.username,
     },
@@ -78,20 +79,32 @@ usersRouter.get('/:id', async (req, res) => {
   }
 })
 
-usersRouter.put('/:username', async (req, res) => {
-  const { username } = req.body
+usersRouter.put('/:username', tokenExtractor, async (req, res) => {
   const user = await User.findOne({
+    attributes: { exclude: ['passwordHash'] },
     where: {
       username: req.params.username,
     },
   })
-  if (user) {
-    user.username = username
-    const updatedUser = await user.save()
-    res.json(updatedUser)
-  } else {
+
+  if (!user) {
     res.status(404).end()
   }
+
+  if (req.body.disabled !== undefined) {
+    const isAdmin = await User.findByPk(req.token.id)
+    if (!isAdmin.admin) {
+      return res.status(401).json({ error: 'operation not allowed' })
+    }
+    user.disabled = req.body.disabled
+  }
+
+  if (req.body.username) {
+    user.username = req.body.username
+  }
+
+  const updatedUser = await user.save()
+  res.json(updatedUser)
 })
 
 module.exports = usersRouter
