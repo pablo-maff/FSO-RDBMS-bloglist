@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const { randomBytes } = require('crypto')
 
-const loginRouter = require('express').Router()
+const sessionRouter = require('express').Router()
 
 const { SECRET } = require('../utils/config')
 const { User } = require('../models')
+const Session = require('../models/session')
+const { tokenExtractor, userExtractor } = require('../utils/middleware')
 
-loginRouter.post('/', async (req, res) => {
+sessionRouter.post('/login', async (req, res) => {
   const { username, password } = req.body
 
   const user = await User.findOne({
@@ -33,6 +36,7 @@ loginRouter.post('/', async (req, res) => {
   const userForToken = {
     username: user.username,
     id: user.id,
+    sessionToken: randomBytes(64).toString('hex'),
   }
 
   const token = jwt.sign(
@@ -41,7 +45,27 @@ loginRouter.post('/', async (req, res) => {
     //{ expiresIn: 60*60 }
   )
 
+  await Session.create({
+    userId: user.id,
+    sessionToken: userForToken.sessionToken,
+  })
+
   res.status(200).send({ token, username: user.username, name: user.name })
 })
 
-module.exports = loginRouter
+sessionRouter.delete(
+  '/logout',
+  tokenExtractor,
+  userExtractor,
+  async (req, res) => {
+    if (req.token) {
+      await Session.destroy({
+        where: { userId: req.user.id },
+      })
+    }
+
+    res.status(204).end()
+  }
+)
+
+module.exports = sessionRouter

@@ -2,7 +2,7 @@ POST http://localhost:3003/api/users/
 Content-Type: application/json
 
 { 
-  "username": "nonSensePoetry@email.co.uk",
-  "name": "Edward Lear",
+  "username": "admin@blogs.com",
+  "name": "Aquí te tengo tu cariñito",
   "password": "password"
 }

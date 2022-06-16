@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Blog = require('../models/blog')
 const { SECRET } = require('./config')
+const Session = require('../models/session')
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'Unknwonw endpoint' })
@@ -40,11 +41,18 @@ const errorHandler = (error, req, res, next) => {
   next(error)
 }
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = async (req, res, next) => {
   const authorization = req.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     const token = authorization.substring(7)
     req.token = jwt.verify(token, SECRET)
+    req.sessionToken = await Session.findOne({
+      where: { sessionToken: req.token.sessionToken },
+    })
+
+    if (!req.sessionToken) {
+      res.status(401).json({ error: 'token missing' })
+    }
 
     next()
   } else {

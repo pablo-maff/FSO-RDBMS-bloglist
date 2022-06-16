@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vblNlbnNlUG9ldHJ5QGVtYWlsLmNvLnVrIiwiaWQiOjEsImlhdCI6MTY1NTAzMDY5N30.1LerksnznQQEgUh_j9CZFVgYuRoakcld87GJsHxOf3c
+# Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBhYmxvQGdtYWlsLmNvbSIsImlkIjoyLCJzZXNzaW9uVG9rZW4iOiJkOTNmMGRjNWUzNjg0YzA1OGE2NDJhMzkxODA4NDcyNTRjMjEyNjg5ODU3ZWRmNTM2ZTI4NzNjODIzMDQ2NjExNjI1ZjY5NjQ0MzJhMmYxN2ViMGMyZWY2NjVkNGY4NTNjNzI4ZGVkNTcxMzg0MWI4NDhmOWM2YjU0ZDE0OWMzMyIsImlhdCI6MTY1NTQxNDc0OX0.Y9k_Nmn-FDO331reVhQVy82tEy80lCbv3X9VwNa70l4
 
 {
-"title": "Data Models",
-"author": "Martin Fowler",
-"url": "https://martinfowler.com/articles/evodb.htmlhttps://martinfowler.com/bliki/DataModels.html",
-"year": 2004
+"title": "Functional Duplications",
+"author": "Robert C. Martin (Uncle Bob)",
+"url": "http://blog.cleancoder.com/uncle-bob/2021/10/28/functional-duplication.html",
+"year": 2021
 }

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const { User, Blog } = require('../models')
+const Session = require('../models/session')
 const { tokenExtractor } = require('../utils/middleware')
 
 usersRouter.get('/', async (req, res) => {
@@ -95,6 +96,11 @@ usersRouter.put('/:username', tokenExtractor, async (req, res) => {
     const isAdmin = await User.findByPk(req.token.id)
     if (!isAdmin.admin) {
       return res.status(401).json({ error: 'operation not allowed' })
+    }
+    if (!user.disabled) {
+      await Session.destroy({
+        where: { userId: user.id },
+      })
     }
     user.disabled = req.body.disabled
   }
